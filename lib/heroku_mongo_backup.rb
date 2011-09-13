@@ -10,6 +10,8 @@ require 'rubygems'
 require 's3'
 
 module Heroku::Mongo
+  Dir["tasks/**/*.rake"].each { |ext| load ext } if defined?(Rake)
+  
   class Backup
     def chdir
       Dir.chdir("tmp")
