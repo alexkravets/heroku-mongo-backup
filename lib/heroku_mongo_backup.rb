@@ -40,6 +40,7 @@ module HerokuMongoBackup
       marshal_dump = Marshal.dump(backup)
   
       file = File.new(@file_name, 'w')
+      file.binmode
       file = Zlib::GzipWriter.new(file)
       file.write marshal_dump
       file.close
@@ -98,6 +99,7 @@ module HerokuMongoBackup
     def s3_download
       open(@file_name, 'w') do |file|
         object = @bucket.objects.find("backups/#{@file_name}")
+        file.binmode
         file.write object.content
       end
     end
