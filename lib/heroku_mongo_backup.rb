@@ -1,4 +1,4 @@
-# coding: UTF-8
+# encoding: UTF-8
 
 require 'mongo'
 require 'bson'
@@ -80,7 +80,7 @@ module HerokuMongoBackup
     end
 
     def s3_connect
-      bucket            = YAML.load_file("config/assets.yml")['s3_bucket']
+      bucket            = ENV['S3_BUCKET']
       access_key_id     = ENV['S3_KEY_ID']
       secret_access_key = ENV['S3_SECRET_KEY']
 
@@ -103,17 +103,16 @@ module HerokuMongoBackup
     end
 
     def initialize
-      # Backup settings
       @file_name = Time.now.strftime("%Y-%m-%d_%H-%M-%S.gz")
   
-      # MongoDB config
-      local_db_name = YAML.load_file("config/mongoid.yml")['development']['database']
+      if ENV[:RAILS_ENV] == 'production'
+        uri = YAML.load_file("config/mongoid.yml")['production']['uri']
+      else
+        config = YAML.load_file("config/mongoid.yml")['development']
+        uri = "mongodb://#{config['host']}:#{config['port']}/#{config['database']}"
+      end
   
-      development_uri = "mongodb://localhost:27017/#{local_db_name}"
-      production_uri = YAML.load_file("config/mongoid.yml")['production']['uri']
-  
-      #@url = development_uri
-      @url = production_uri
+      @url = uri
   
       puts "Using databased: #{@url}"
   

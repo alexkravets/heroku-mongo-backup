@@ -1,7 +1,5 @@
 # encoding: UTF-8
 
-require 'heroku_mongo_backup'
-
 namespace :mongo do
   desc "Backup prodution database and store it on S3.\n
         Example of usage: rake mongo:backup"

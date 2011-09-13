@@ -1,1 +1,25 @@
 Rake task for backing up mongo database on heroku and push it to S3.
+
+== INSTALL
+
+Add to Gemfile:
+
+  gem "heroku-mongo-backup", :git => 'git://github.com/alexkravets/heroku-mongo-backup.git'
+
+or
+
+  gem "heroku-mongo-backup", "~> 0.1.1"
+
+
+Add to application class in /config/application.rb file:
+
+  require 'heroku_mongo_backup'
+
+
+== BACKUP COMMAND
+
+  rake mongo:backup
+  
+== RESTORE COMMAND
+
+  rake mongo:restore FILE=<backup-file.gz>
