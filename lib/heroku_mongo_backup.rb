@@ -9,130 +9,132 @@ require 'yaml'
 require 'rubygems'
 require 's3'
 
-module Heroku::Mongo
-  Dir["tasks/**/*.rake"].each { |ext| load ext } if defined?(Rake)
+module Heroku
+  module Mongo
+    require 'heroku_mongo_backup/railtie' if defined?(Rails)
   
-  class Backup
-    def chdir
-      Dir.chdir("tmp")
-      begin
-        Dir.mkdir("dump")
-      rescue
-      end
-      Dir.chdir("dump")
-    end
-  
-    def store
-      backup = {}
-    
-      @db.collections.each do |col|
-        backup['system.indexes.db.name'] = col.db.name if col.name == "system.indexes"
-      
-        records = []
-      
-        col.find().each do |record|
-          records << record
+    class Backup
+      def chdir
+        Dir.chdir("tmp")
+        begin
+          Dir.mkdir("dump")
+        rescue
         end
-
-        backup[col.name] = records
+        Dir.chdir("dump")
       end
-    
-      marshal_dump = Marshal.dump(backup)
-    
-      file = File.new(@file_name, 'w')
-      file = Zlib::GzipWriter.new(file)
-      file.write marshal_dump
-      file.close
-    end
   
-    def load
-      file = Zlib::GzipReader.open(@file_name)
-      obj = Marshal.load file.read
-      file.close
+      def store
+        backup = {}
+    
+        @db.collections.each do |col|
+          backup['system.indexes.db.name'] = col.db.name if col.name == "system.indexes"
+      
+          records = []
+      
+          col.find().each do |record|
+            records << record
+          end
 
-      obj.each do |col_name, records|
-        next if col_name =~ /^system\./
+          backup[col.name] = records
+        end
+    
+        marshal_dump = Marshal.dump(backup)
+    
+        file = File.new(@file_name, 'w')
+        file = Zlib::GzipWriter.new(file)
+        file.write marshal_dump
+        file.close
+      end
+  
+      def load
+        file = Zlib::GzipReader.open(@file_name)
+        obj = Marshal.load file.read
+        file.close
+
+        obj.each do |col_name, records|
+          next if col_name =~ /^system\./
       
-        @db.drop_collection(col_name)
-        dest_col = @db.create_collection(col_name)
+          @db.drop_collection(col_name)
+          dest_col = @db.create_collection(col_name)
       
-        records.each do |record|
-          dest_col.insert record
+          records.each do |record|
+            dest_col.insert record
+          end
+        end
+    
+        # Load indexes here
+        col_name = "system.indexes"
+        dest_index_col = @db.collection(col_name)
+        obj[col_name].each do |index|
+          if index['_id']
+            index['ns'] = index['ns'].sub(obj['system.indexes.db.name'], dest_index_col.db.name)
+            dest_index_col.insert index
+          end
         end
       end
-    
-      # Load indexes here
-      col_name = "system.indexes"
-      dest_index_col = @db.collection(col_name)
-      obj[col_name].each do |index|
-        if index['_id']
-          index['ns'] = index['ns'].sub(obj['system.indexes.db.name'], dest_index_col.db.name)
-          dest_index_col.insert index
+  
+      def connect
+        uri = URI.parse(@url)
+        connection = ::Mongo::Connection.new(uri.host, uri.port)
+        @db = connection.db(uri.path.gsub(/^\//, ''))
+        @db.authenticate(uri.user, uri.password) if uri.user
+      end
+  
+      def s3_connect
+        bucket            = YAML.load_file("config/assets.yml")['s3_bucket']
+        access_key_id     = ENV['S3_KEY_ID']
+        secret_access_key = ENV['S3_SECRET_KEY']
+
+        service = S3::Service.new(:access_key_id => access_key_id,
+                                  :secret_access_key => secret_access_key)
+        @bucket = service.buckets.find(bucket)
+      end
+  
+      def s3_upload
+        object = @bucket.objects.build("backups/#{@file_name}")
+        object.content = open(@file_name)
+        object.save
+      end
+  
+      def s3_download
+        open(@file_name, 'w') do |file|
+          object = @bucket.objects.find("backups/#{@file_name}")
+          file.write object.content
         end
       end
-    end
   
-    def connect
-      uri = URI.parse(@url)
-      connection = ::Mongo::Connection.new(uri.host, uri.port)
-      @db = connection.db(uri.path.gsub(/^\//, ''))
-      @db.authenticate(uri.user, uri.password) if uri.user
-    end
-  
-    def s3_connect
-      bucket            = YAML.load_file("config/assets.yml")['s3_bucket']
-      access_key_id     = ENV['S3_KEY']
-      secret_access_key = ENV['S3_SECRET']
-
-      service = S3::Service.new(:access_key_id => access_key_id,
-                                :secret_access_key => secret_access_key)
-      @bucket = service.buckets.find(bucket)
-    end
-  
-    def s3_upload
-      object = @bucket.objects.build("backups/#{@file_name}")
-      object.content = open(@file_name)
-      object.save
-    end
-  
-    def s3_download
-      open(@file_name, 'w') do |file|
-        object = @bucket.objects.find("backups/#{@file_name}")
-        file.write object.content
+      def initialize
+        # Backup settings
+        @file_name = Time.now.strftime("%Y-%m-%d_%H-%M-%S.gz")
+    
+        # MongoDB config
+        local_db_name = YAML.load_file("config/mongoid.yml")['development']['database']
+    
+        development_uri = "mongodb://localhost:27017/#{local_db_name}"
+        production_uri = YAML.load_file("config/mongoid.yml")['production']['uri']
+    
+        #@url = development_uri
+        @url = production_uri
+    
+        puts "Using databased: #{@url}"
+    
+        self.connect
+        self.s3_connect
       end
-    end
   
-    def initialize
-      # Backup settings
-      @file_name = Time.now.strftime("%Y-%m-%d_%H-%M-%S.gz")
-    
-      # MongoDB config
-      local_db_name = YAML.load_file("config/mongoid.yml")['development']['database']
-    
-      development_uri = "mongodb://localhost:27017/#{local_db_name}"
-      production_uri = YAML.load_file("config/mongoid.yml")['production']['uri']
-    
-      #@url = development_uri
-      @url = production_uri
-    
-      puts "Using databased: #{@url}"
-    
-      self.connect
-      self.s3_connect
-    end
+      def backup
+        self.chdir    
+        self.store
+        self.s3_upload
+      end
   
-    def backup
-      self.chdir    
-      self.store
-      self.s3_upload
-    end
-  
-    def restore file_name
-      @file_name = file_name
+      def restore file_name
+        @file_name = file_name
     
-      self.chdir
-      self.s3_download
-      self.load
+        self.chdir
+        self.s3_download
+        self.load
+      end
     end
   end
 end
