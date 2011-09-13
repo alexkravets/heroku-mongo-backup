@@ -105,7 +105,7 @@ module HerokuMongoBackup
     def initialize
       @file_name = Time.now.strftime("%Y-%m-%d_%H-%M-%S.gz")
   
-      if ENV[:RAILS_ENV] == 'production'
+      if ENV['RAILS_ENV'] == 'production'
         uri = YAML.load_file("config/mongoid.yml")['production']['uri']
       else
         config = YAML.load_file("config/mongoid.yml")['development']
