@@ -14,7 +14,7 @@ module HerokuMongoBackup
 
   class Backup
     def chdir
-      Dir.chdir("tmp")
+      Dir.chdir("/tmp")
       begin
         Dir.mkdir("dump")
       rescue
