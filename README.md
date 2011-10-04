@@ -1,4 +1,4 @@
-# heroku-mongo-backup — backup mongodb and push it to S3 on HEROKU
+# heroku-mongo-backup — backup mongodb and push it to S3 on Heroku
 
 > Why not to use regular mongodump command?
 
@@ -13,11 +13,11 @@
 
 ## Setup and configuration
 
-1. Add library to the ```Gemfile```:
+Add library to the ```Gemfile```:
 
 ```gem "heroku-mongo-backup"``` or ```gem "heroku-mongo-backup", :git => 'git://github.com/alexkravets/heroku-mongo-backup.git'```
 
-2. Add backup task to ```/lib/tasks/cron.rake``` file:
+Add backup task to ```/lib/tasks/cron.rake``` file:
 
 ```
 require 'heroku_mongo_backup'
@@ -30,16 +30,15 @@ task :cron => :environment do
 end
 ```
 
-3. Set Heroku environment variables:
+Set Heroku environment variables:
 
 ```heroku config:add S3_BUCKET=_value_ S3_KEY_ID=_value_ S3_SECRET_KEY=_value_ MONGO_URL=_value_```
 
 First three are Amazon S3 auth settings and the last one should be copy of *MONGOHQ_URI* or *MONGOLAB_URI* depending on what heroku add-on is used for mongo. *MONGO_URL* is a variable which is used also for **heroku-mongo-sync** command.
 
-**Rake commands**
+**Rake commands:**
 
-Backup: ```heroku rake mongo:backup```
-
-Restore: ```heroku rake mongo:restore FILE=backup-file-name.gz```
+* ```heroku rake mongo:backup```
+* ```heroku rake mongo:restore FILE=backup-file-name.gz```
 
 Copyright (c) 2011 Alex Kravets <a@alexkravets.com>, released under the MIT license
