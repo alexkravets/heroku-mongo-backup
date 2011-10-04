@@ -6,9 +6,9 @@
 
 *heroku-mongo-backup* does:
 
-1. Backups all db collections to the single file in _tmp_ folder;
+1. Backup db collections to the single file;
 2. Gunzip the file;
-3. Pushes gzipped file to the Amazon S3 server;
+3. Pushes backup to the specified S3 bucket;
 
 
 ## Setup and configuration
