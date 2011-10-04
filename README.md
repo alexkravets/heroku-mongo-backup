@@ -4,7 +4,7 @@
 
 *mongodump* command is not available on Heroku side. To backup database third party service should be used. If you don't want to setup third party for every project *heroku-mongo-backup* may be helpful.
 
-*heroku-mongo-backup* does:
+**heroku-mongo-backup** does:
 
 1. Backup db collections to the single file;
 2. Gunzip the file;
