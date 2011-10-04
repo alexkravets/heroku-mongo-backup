@@ -108,8 +108,9 @@ module HerokuMongoBackup
       @file_name = Time.now.strftime("%Y-%m-%d_%H-%M-%S.gz")
   
       if ENV['RAILS_ENV'] == 'production'
-        config_template = ERB.new(IO.read("config/mongoid.yml"))
-        uri = YAML.load(config_template.result)['production']['uri']
+        #config_template = ERB.new(IO.read("config/mongoid.yml"))
+        #uri = YAML.load(config_template.result)['production']['uri']
+        uri = ENV['MONGO_URL']
       else
         config = YAML.load_file("config/mongoid.yml")['development']
         uri = "mongodb://#{config['host']}:#{config['port']}/#{config['database']}"

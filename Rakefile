@@ -6,5 +6,5 @@ gem.define()
 
 desc "Push gem to rubygems.org"
 task :push => :gem do
-  sh "gem push pkg/heroku-mongo-backup-0.2.0.gem"
+  sh "gem push pkg/heroku-mongo-backup-0.2.1.gem"
 end
