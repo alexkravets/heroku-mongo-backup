@@ -23,7 +23,7 @@ Add backup task to ```/lib/tasks/cron.rake``` file:
 require 'heroku_mongo_backup'
 
 desc "This task is called by the Heroku cron add-on"
-task :cron => :production do
+task :cron => :environment do
   if Time.now.hour == 0 # run at midnight
     HerokuMongoBackup::Backup.new.backup
   end
