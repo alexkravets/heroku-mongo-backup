@@ -17,6 +17,8 @@ Add library to the ```Gemfile```:
 
 ```gem "heroku-mongo-backup"``` or ```gem "heroku-mongo-backup", :git => 'git://github.com/alexkravets/heroku-mongo-backup.git'```
 
+**heroku-mongo-backup** requires ```s3``` or ```aws-s3``` library. So one of those should be in ```Gemfile```. If there is no any of these two, add ```aws-s3```.
+
 Add backup task to ```/lib/tasks/cron.rake``` file:
 
 ```
