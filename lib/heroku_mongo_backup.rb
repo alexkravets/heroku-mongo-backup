@@ -10,6 +10,7 @@ require 'rubygems'
 
 module HerokuMongoBackup
   require 'heroku_mongo_backup/railtie' if defined?(Rails)
+  require 's3_helpers'
 
   class Backup
     def chdir
@@ -72,7 +73,7 @@ module HerokuMongoBackup
       end
     end
 
-    def connect
+    def db_connect
       uri = URI.parse(@url)
       connection = ::Mongo::Connection.new(uri.host, uri.port)
       @db = connection.db(uri.path.gsub(/^\//, ''))
@@ -80,8 +81,6 @@ module HerokuMongoBackup
     end
 
     def s3_connect
-      require 's3'
-
       bucket            = ENV['S3_BUCKET']
 
       access_key_id     = ENV['S3_KEY_ID']
@@ -94,22 +93,18 @@ module HerokuMongoBackup
         secret_access_key = ENV['S3_SECRET']
       end
 
-      service = S3::Service.new(:access_key_id => access_key_id,
-                                :secret_access_key => secret_access_key)
-      @bucket = service.buckets.find(bucket)
+      @bucket = HerokuMongoBackup::s3_connect(bucket, access_key_id, secret_access_key)
     end
 
     def s3_upload
-      object = @bucket.objects.build("backups/#{@file_name}")
-      object.content = open(@file_name)
-      object.save
+      HerokuMongoBackup::s3_upload(@bucket, @file_name)
     end
 
     def s3_download
       open(@file_name, 'w') do |file|
-        object = @bucket.objects.find("backups/#{@file_name}")
+        file_content = HerokuMongoBackup::s3_download(@bucket, @file_name)
         file.binmode
-        file.write object.content
+        file.write file_content
       end
     end
 
@@ -137,7 +132,7 @@ module HerokuMongoBackup
   
       puts "Using databased: #{@url}"
   
-      self.connect
+      self.db_connect
       self.s3_connect
     end
 
@@ -156,3 +151,4 @@ module HerokuMongoBackup
     end
   end
 end
+
