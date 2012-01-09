@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = 'heroku-mongo-backup'
-  s.version = '0.2.2'
+  s.version = '0.2.3'
   s.summary = 'Rake task backups mongo database on Heroku and push gzipped file to Amazon S3.'
   s.description = 'Rake task for backing up mongo database on heroku and push it to S3. Library can be used as rake task or be easily integrated into daily cron job.'
 
@@ -8,10 +8,11 @@ Gem::Specification.new do |s|
   s.email    = 'a@alexkravets.com'
   s.homepage = 'https://github.com/alexkravets/heroku-mongo-backup'
 
+  s.add_dependency              's3', '~> 0.3.11'
   # These dependencies are only for people who work on this gem
-  s.add_development_dependency 'rspec'
-  s.add_development_dependency 'mocha'
-  s.add_development_dependency 'crack'
+  s.add_development_dependency  'rspec'
+  s.add_development_dependency  'mocha'
+  s.add_development_dependency  'crack'
   
 
   # Include everything in the lib folder
