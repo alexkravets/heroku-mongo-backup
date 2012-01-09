@@ -7,7 +7,6 @@ require 'zlib'
 require 'uri'
 require 'yaml'
 require 'rubygems'
-require 's3'
 
 module HerokuMongoBackup
   require 'heroku_mongo_backup/railtie' if defined?(Rails)
@@ -81,9 +80,19 @@ module HerokuMongoBackup
     end
 
     def s3_connect
+      require 's3'
+
       bucket            = ENV['S3_BUCKET']
+
       access_key_id     = ENV['S3_KEY_ID']
+      if access_key_id.nil?
+        access_key_id   = ENV['S3_KEY']
+      end
+
       secret_access_key = ENV['S3_SECRET_KEY']
+      if secret_access_key.nil?
+        secret_access_key = ENV['S3_SECRET']
+      end
 
       service = S3::Service.new(:access_key_id => access_key_id,
                                 :secret_access_key => secret_access_key)
@@ -112,8 +121,16 @@ module HerokuMongoBackup
         #uri = YAML.load(config_template.result)['production']['uri']
         uri = ENV['MONGO_URL']
       else
-        config = YAML.load_file("config/mongoid.yml")['development']
-        uri = "mongodb://#{config['host']}:#{config['port']}/#{config['database']}"
+        mongoid_config  = YAML.load_file("config/mongoid.yml")
+        config          = mongoid_config['defaults']
+        dev_config      = mongoid_config['development']
+
+        config.merge!(dev_config)
+
+        host            = config['host']
+        port            = config['port']
+        database        = config['database']
+        uri = "mongodb://#{host}:#{port}/#{database}"
       end
   
       @url = uri
