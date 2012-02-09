@@ -81,7 +81,10 @@ module HerokuMongoBackup
     end
 
     def s3_connect
-      bucket            = ENV['S3_BUCKET']
+      bucket            = ENV['S3_BACKUPS_BUCKET']
+      if bucket.nil?
+        bucket          = ENV['S3_BUCKET']
+      end
 
       access_key_id     = ENV['S3_KEY_ID']
       if access_key_id.nil?

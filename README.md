@@ -34,7 +34,7 @@ end
 
 Set Heroku environment variables:
 
-```heroku config:add S3_BUCKET=_value_ S3_KEY_ID=_value_ S3_SECRET_KEY=_value_ MONGO_URL=_value_```
+```heroku config:add S3_BACKUPS_BUCKET=_value_ S3_KEY_ID=_value_ S3_SECRET_KEY=_value_ MONGO_URL=_value_```
 
 First three are Amazon S3 auth settings and the last one should be copy of *MONGOHQ_URI* or *MONGOLAB_URI* depending on what heroku add-on is used for mongo. *MONGO_URL* is a variable which is used also for **heroku-mongo-sync** command.
 
@@ -46,7 +46,7 @@ First three are Amazon S3 auth settings and the last one should be copy of *MONG
 
 # License (MIT)
 
-Copyright (c) 2011 Alex Kravets <a@alexkravets.com>
+Copyright (c) 2011 Alex Kravets <santyor@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
