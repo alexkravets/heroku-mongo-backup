@@ -1,68 +1,48 @@
-# heroku-mongo-backup — backup mongodb and push it to S3 on Heroku
-
-> Why not to use regular mongodump command?
-
-*mongodump* command is not available on Heroku side. To backup database third party service should be used. If you don't want to setup third party for every project *heroku-mongo-backup* may be helpful.
+## heroku-mongo-backup *— backup mongodb and push it to S3 on Heroku*
 
 **heroku-mongo-backup** does:
 
-1. Backup db collections to the single file;
-2. Gunzip the file;
-3. Pushes backup to the specified S3 bucket;
+1. Backup mongodb collections to one file;
+2. Compress backup file with gzip;
+3. Push backup to the specified S3 bucket;
+
+> Why not mongodump command?
+
+*mongodump* command is not available on Heroku side. If you don't want to setup third party backup service for every project *heroku-mongo-backup* may be helpful.
 
 
-## Setup and configuration
+## Configuration
 
-Add library to the ```Gemfile```:
+1. Add gem to the ```Gemfile```: ```gem "heroku-mongo-backup"```
 
-```gem "heroku-mongo-backup"``` or ```gem "heroku-mongo-backup", :git => 'git://github.com/alexkravets/heroku-mongo-backup.git'```
+For S3 support **heroku-mongo-backup** requires ```s3``` or ```aws-s3``` library. One of those should be in ```Gemfile```, if any of those two is present add ```aws-s3```.
 
-**heroku-mongo-backup** requires ```s3``` or ```aws-s3``` library. So one of those should be in ```Gemfile```. If there is no any of these two, add ```aws-s3```.
-
-Add backup task to ```/lib/tasks/cron.rake``` file:
+2. Require for *heroku_mongo_backup* in ```config\application.rb```:
 
 ```
-require 'heroku_mongo_backup'
+...
+  class Application < Rails::Application
+    require 'heroku_mongo_backup'
+...
+```
 
+3. Add backup task to ```/lib/tasks/cron.rake``` file:
+
+```
 desc "This task is called by the Heroku cron add-on"
 task :cron => :environment do
-  if Time.now.hour == 0 # run at midnight
-    HerokuMongoBackup::Backup.new.backup
-  end
+  Rake::Task['mongo:backup'].invoke
 end
 ```
 
-Set Heroku environment variables:
+4. Set Heroku environment variables:
 
 ```heroku config:add S3_BACKUPS_BUCKET=_value_ S3_KEY_ID=_value_ S3_SECRET_KEY=_value_ MONGO_URL=_value_```
 
 First three are Amazon S3 auth settings and the last one should be copy of *MONGOHQ_URI* or *MONGOLAB_URI* depending on what heroku add-on is used for mongo. *MONGO_URL* is a variable which is used also for **heroku-mongo-sync** command.
 
-**Rake commands:**
+## Rake Commands
 
 * ```heroku rake mongo:backup```
 * ```heroku rake mongo:restore FILE=backup-file-name.gz```
 
-
-# License (MIT)
-
-Copyright (c) 2011 Alex Kravets <santyor@gmail.com>
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
