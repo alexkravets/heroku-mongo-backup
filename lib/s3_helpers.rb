@@ -1,11 +1,17 @@
 begin
   require 's3'
 rescue LoadError
-  puts "There is no 's3' gem in Gemfile."
+  #
+  # There is no 's3' gem in Gmefile
+  #
+  #puts "There is no 's3' gem in Gemfile."
 end
 
 if defined?(S3)
-    puts "Using \'s3\' gem as Amazon S3 interface."
+    #
+    # Using 's3' gem an Amazon S3 interface
+    #
+    #puts "Using \'s3\' gem as Amazon S3 interface."
     def HerokuMongoBackup::s3_connect(bucket, key, secret)
       service = S3::Service.new(:access_key_id     => key,
                                 :secret_access_key => secret)
@@ -33,11 +39,17 @@ if defined?(S3)
     begin
       require 'aws/s3'
     rescue LoadError
-      puts "There is no 'aws/s3' gem in Gemfile."
+      #
+      # There is no 'aws/s3' in Gemfile
+      #
+      #puts "There is no 'aws/s3' gem in Gemfile."
     end
 
     if defined?(AWS)
-      puts "Using \'aws/s3\' gem as Amazon S3 interface."
+      #
+      # Using 'aws/s3' gem as Amazon S3 interface
+      #
+      #puts "Using \'aws/s3\' gem as Amazon S3 interface."
       def HerokuMongoBackup::s3_connect(bucket, key, secret)
         AWS::S3::Base.establish_connection!(:access_key_id     => key,
                                             :secret_access_key => secret)
@@ -51,7 +63,8 @@ if defined?(S3)
         return content
       end
     else
-      puts "Please include 's3' or 'aws/s3' gem in applications Gemfile."
+      logging = Logger.new(STDOUT)
+      logging.error "heroku-mongo-backup: Please include 's3' or 'aws/s3' gem in applications Gemfile."
     end
 end
 
