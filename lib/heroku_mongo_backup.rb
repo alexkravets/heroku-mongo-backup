@@ -162,7 +162,7 @@ module HerokuMongoBackup
       end
     end
 
-    def backup backup_to = :s3
+    def backup
       self.chdir    
       self.store
       if ENV['UPLOAD_TYPE'] == 'ftp'
@@ -171,8 +171,10 @@ module HerokuMongoBackup
       else
         self.s3_upload
       end
+      
+      return @file_name
     end
-
+    
     def restore file_name
       @file_name = file_name
   

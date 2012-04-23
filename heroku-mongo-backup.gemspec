@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = 'heroku-mongo-backup'
-  s.version = '0.3.3'
+  s.version = '0.3.4'
   s.summary = 'Rake task backups mongo database on Heroku and push gzipped file to Amazon S3.'
   s.description = 'Rake task for backing up mongo database on heroku and push it to S3. Library can be used as rake task or be easily integrated into daily cron job.'
 
