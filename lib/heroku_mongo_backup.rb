@@ -151,7 +151,7 @@ module HerokuMongoBackup
       puts "Using databased: #{@url}"
   
       self.db_connect
-      if ENV['upload_type'] == 'ftp'
+      if ENV['UPLOAD_TYPE'] == 'ftp'
         self.ftp_connect
       else
         self.s3_connect
@@ -161,7 +161,7 @@ module HerokuMongoBackup
     def backup backup_to = :s3
       self.chdir    
       self.store
-      if ENV['upload_type'] == 'ftp'
+      if ENV['UPLOAD_TYPE'] == 'ftp'
         self.ftp_upload
         @ftp.close
       else
@@ -173,7 +173,7 @@ module HerokuMongoBackup
       @file_name = file_name
   
       self.chdir
-      if ENV['upload_type'] == 'ftp'
+      if ENV['UPLOAD_TYPE'] == 'ftp'
         self.ftp_download
         @ftp.close
       else
