@@ -92,7 +92,11 @@ module HerokuMongoBackup
     end
     
     def ftp_download
-      @file_name = @ftp.getbinaryfile(@file_name)
+      open(@file_name, 'w') do |file|
+        file_content = @ftp.getbinaryfile(@file_name)
+        file.binmode
+        file.write file_content
+      end
     end
     
     def s3_connect
