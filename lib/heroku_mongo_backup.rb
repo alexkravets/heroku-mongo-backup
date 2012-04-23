@@ -171,8 +171,6 @@ module HerokuMongoBackup
       else
         self.s3_upload
       end
-      
-      return @file_name
     end
     
     def restore file_name
