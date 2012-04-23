@@ -7,6 +7,7 @@ require 'zlib'
 require 'uri'
 require 'yaml'
 require 'rubygems'
+require 'net/ftp'
 
 module HerokuMongoBackup
   require 'heroku_mongo_backup/railtie' if defined?(Rails)
@@ -79,7 +80,21 @@ module HerokuMongoBackup
       @db = connection.db(uri.path.gsub(/^\//, ''))
       @db.authenticate(uri.user, uri.password) if uri.user
     end
-
+    
+    def ftp_connect
+      @ftp = Net::FTP.new(ENV['FTP_HOST'])
+      @ftp.passive = true
+      @ftp.login(ENV['FTP_USERNAME'], ENV['FTP_PASSWORD'])
+    end
+    
+    def ftp_upload
+      @ftp.putbinaryfile(@file_name)
+    end
+    
+    def ftp_download
+      @file_name = @ftp.getbinaryfile(@file_name)
+    end
+    
     def s3_connect
       bucket            = ENV['S3_BACKUPS_BUCKET']
       if bucket.nil?
@@ -136,20 +151,34 @@ module HerokuMongoBackup
       puts "Using databased: #{@url}"
   
       self.db_connect
-      self.s3_connect
+      if ENV['upload_type'] == 'ftp'
+        self.ftp_connect
+      else
+        self.s3_connect
+      end
     end
 
-    def backup
+    def backup backup_to = :s3
       self.chdir    
       self.store
-      self.s3_upload
+      if ENV['upload_type'] == 'ftp'
+        self.ftp_upload
+        @ftp.close
+      else
+        self.s3_upload
+      end
     end
 
     def restore file_name
       @file_name = file_name
   
       self.chdir
-      self.s3_download
+      if ENV['upload_type'] == 'ftp'
+        self.ftp_download
+        @ftp.close
+      else
+        self.s3_download
+      end
       self.load
     end
   end
