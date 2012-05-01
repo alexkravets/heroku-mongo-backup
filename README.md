@@ -1,10 +1,10 @@
-## heroku-mongo-backup *— backup mongodb and push it to S3 on Heroku*
+## heroku-mongo-backup *— backup mongodb on Heroku and push it to S3 or FTP storage*
 
 **heroku-mongo-backup** does:
 
 1. Backup mongodb collections to one file;
 2. Compress backup file with gzip;
-3. Push backup to the specified S3 bucket;
+3. Push backup to the specified S3 bucket or FTP server;
 
 > Why not mongodump command?
 
@@ -41,8 +41,18 @@ Set Heroku environment variables:
 
 First three are Amazon S3 auth settings and the last one should be copy of *MONGOHQ_URI* or *MONGOLAB_URI* depending on what heroku add-on is used for mongo. *MONGO_URL* is a variable which is used also for **heroku-mongo-sync** command.
 
+For FTP set these variables:
+
+```heroku config:add UPLOAD_TYPE=ftp FTP_HOST=_host_ FTP_PASSWORD=_pass_ FTP_USERNAME=_user_```
+
+
 ## Rake Commands
 
 * ```heroku rake mongo:backup```
 * ```heroku rake mongo:restore FILE=backup-file-name.gz```
 
+
+## Contributors
+
+1. [alexkravets](http://slatestudio.com "Slate Studio") - S3 support
+2. [matyi](https://github.com/matyi "Matyi - GitHub Profile") - FTP support
