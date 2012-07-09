@@ -26,7 +26,7 @@ Require for *heroku_mongo_backup* in ```config\application.rb```:
 ...
 ```
 
-Add backup task to ```/lib/tasks/cron.rake``` file:
+Configure heroku scheduler to run ```mongo:backup``` rake task. Or if cron is used add backup task to ```/lib/tasks/cron.rake``` file:
 
 ```
 desc "This task is called by the Heroku cron add-on"
@@ -56,3 +56,4 @@ For FTP set these variables:
 
 1. [alexkravets](http://slatestudio.com "Slate Studio") - S3 support
 2. [matyi](https://github.com/matyi "Matyi - GitHub Profile") - FTP support
+3. [stefl](http://stef.io "Stef Lewandowski") - Rails is not required for production
