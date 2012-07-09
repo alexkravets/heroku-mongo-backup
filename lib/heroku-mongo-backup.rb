@@ -10,7 +10,15 @@ require 'rubygems'
 require 'net/ftp'
 
 module HerokuMongoBackup
-  require 'heroku_mongo_backup/railtie' if defined?(Rails)
+
+  if defined?(Rails)
+    class Railtie < Rails::Railtie
+      rake_tasks do
+        load "tasks/heroku_mongo_backup.rake"
+      end
+    end
+  end
+
   require 's3_helpers'
 
   class Backup

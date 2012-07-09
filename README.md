@@ -13,18 +13,9 @@
 
 ## Configuration
 
-Add gem to the ```Gemfile```: ```gem "heroku-mongo-backup"```
+Add gem to the ```Gemfile```: ```gem "heroku-mongo-backup"``` - if everything's okay ```rake -T``` command should show ```rake mongo:backup``` rake tasks.
 
 For S3 support **heroku-mongo-backup** requires ```s3``` or ```aws-s3``` library. One of those should be in ```Gemfile```, if any of those two is present add ```aws-s3```.
-
-Require for *heroku_mongo_backup* in ```config\application.rb```:
-
-```
-...
-  class Application < Rails::Application
-   require 'heroku_mongo_backup'
-...
-```
 
 Configure heroku scheduler to run ```mongo:backup``` rake task. Or if cron is used add backup task to ```/lib/tasks/cron.rake``` file:
 
@@ -54,6 +45,6 @@ For FTP set these variables:
 
 ## Contributors
 
-1. [alexkravets](http://slatestudio.com "Slate Studio") - S3 support
+1. [alexkravets@slatestudio.com](http://slatestudio.com "Slate Studio") - gem itself with S3 support
 2. [matyi](https://github.com/matyi "Matyi - GitHub Profile") - FTP support
 3. [stefl](http://stef.io "Stef Lewandowski") - Rails is not required for production
