@@ -147,9 +147,11 @@ module HerokuMongoBackup
         uri = ENV['MONGO_URL']
       else
         mongoid_config  = YAML.load_file("config/mongoid.yml")
-        config          = mongoid_config['defaults']
+        config = {}
+        defaults          = mongoid_config['defaults']
         dev_config      = mongoid_config['development']
 
+        config.merge!(defaults) unless defaults.nil?
         config.merge!(dev_config)
 
         host            = config['host']
