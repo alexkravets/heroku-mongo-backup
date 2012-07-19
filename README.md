@@ -45,7 +45,7 @@ For FTP set these variables:
 
 ## Awesome Contributors
 
-1. [alexkravets@slatestudio.com](http://slatestudio.com "Slate Studio") - gem itself with S3 support
+1. [alexkravets - slatestudio.com](http://slatestudio.com "Slate Studio") - gem itself with S3 support
 2. [matyi](https://github.com/matyi "Matyi - GitHub Profile") - FTP support
-3. [stefl](http://stef.io "Stef Lewandowski") - Rails is not required for production
-4. [moonhouse](http://www.moonhouse.se/ "David Hall") - default config improvement
+3. [stefl - stef.io](http://stef.io "Stef Lewandowski") - Rails is not required for production
+4. [moonhouse - moonhouse.se](http://www.moonhouse.se/ "David Hall") - default config improvement
