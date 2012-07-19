@@ -39,8 +39,8 @@ For FTP set these variables:
 
 ## Rake Commands
 
-* ```heroku rake mongo:backup```
-* ```heroku rake mongo:restore FILE=backup-file-name.gz```
+* ```heroku run rake mongo:backup```
+* ```heroku run rake mongo:restore FILE=backup-file-name.gz```
 
 
 ## Awesome Contributors
