@@ -11,7 +11,7 @@ require 'net/ftp'
 
 module HerokuMongoBackup
 
-  if defined?(Rails)
+  if defined?(Rails::Railtie)
     class Railtie < Rails::Railtie
       rake_tasks do
         load "tasks/heroku_mongo_backup.rake"
