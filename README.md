@@ -42,6 +42,9 @@ For FTP set these variables:
 * ```heroku run rake mongo:backup```
 * ```heroku run rake mongo:restore FILE=backup-file-name.gz```
 
+For Rails 2 add this to your Rakefile to import rake tasks:
+
+```import File.expand_path(File.join(Gem.datadir('heroku-mongo-backup'), '..', '..', 'lib', 'tasks', 'heroku_mongo_backup.rake'))```
 
 ## Awesome Contributors
 
