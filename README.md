@@ -46,9 +46,10 @@ For Rails 2 add this to your Rakefile to import rake tasks:
 
 ```import File.expand_path(File.join(Gem.datadir('heroku-mongo-backup'), '..', '..', 'lib', 'tasks', 'heroku_mongo_backup.rake'))```
 
-## Awesome Contributors
+## Gem Contributors
 
 1. [alexkravets - slatestudio.com](http://slatestudio.com "Slate Studio") - gem itself with S3 support
 2. [matyi](https://github.com/matyi "Matyi - GitHub Profile") - FTP support
 3. [stefl - stef.io](http://stef.io "Stef Lewandowski") - Rails is not required for production
 4. [moonhouse - moonhouse.se](http://www.moonhouse.se/ "David Hall") - default config improvement
+5. [wolfpakz](https://github.com/wolfpakz "Dan Porter") - Rails2 support
