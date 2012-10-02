@@ -1,10 +1,11 @@
 begin
   require 's3'
+  
 rescue LoadError
-  #
-  # There is no 's3' gem in Gmefile
-  #
-  #puts "There is no 's3' gem in Gemfile."
+    #
+    # There is no 's3' gem in Gmefile
+    #
+    #puts "There is no 's3' gem in Gemfile."
 end
 
 if defined?(S3)
@@ -18,11 +19,13 @@ if defined?(S3)
       bucket  = service.buckets.find(bucket)
       return bucket
     end
+
     def HerokuMongoBackup::s3_upload(bucket, filename)
       object = bucket.objects.build("backups/#{filename}")
       object.content = open(filename)
       object.save
     end
+
     def HerokuMongoBackup::s3_download(bucket, filename)
       object  = bucket.objects.find("backups/#{filename}")
       content = object.content(reload=true)
@@ -35,36 +38,91 @@ if defined?(S3)
 
       return content
     end
-  else
-    begin
-      require 'aws/s3'
-    rescue LoadError
-      #
-      # There is no 'aws/s3' in Gemfile
-      #
-      #puts "There is no 'aws/s3' gem in Gemfile."
-    end
-
-    if defined?(AWS)
-      #
-      # Using 'aws/s3' gem as Amazon S3 interface
-      #
-      #puts "Using \'aws/s3\' gem as Amazon S3 interface."
-      def HerokuMongoBackup::s3_connect(bucket, key, secret)
-        AWS::S3::Base.establish_connection!(:access_key_id     => key,
-                                            :secret_access_key => secret)
-        return bucket
-      end
-      def HerokuMongoBackup::s3_upload(bucket, filename)
-        AWS::S3::S3Object.store("backups/#{filename}", open(filename), bucket)
-      end
-      def HerokuMongoBackup::s3_download(bucket, filename)
-        content = AWS::S3::S3Object.value("backups/#{filename}", bucket)
-        return content
-      end
-    else
-      logging = Logger.new(STDOUT)
-      logging.error "heroku-mongo-backup: Please include 's3' or 'aws/s3' gem in applications Gemfile."
-    end
 end
+
+
+
+begin
+  require 'aws/s3'
+rescue LoadError
+  #
+  # There is no 'aws/s3' in Gemfile
+  #
+  #puts "There is no 'aws/s3' gem in Gemfile."
+end
+
+if defined?(AWS)
+  #
+  # Using 'aws/s3' gem as Amazon S3 interface
+  #
+  #puts "Using \'aws/s3\' gem as Amazon S3 interface."
+  def HerokuMongoBackup::s3_connect(bucket, key, secret)
+    AWS::S3::Base.establish_connection!(:access_key_id     => key,
+                                        :secret_access_key => secret)
+    # This is probably doesn't work
+    return bucket
+  end
+
+  def HerokuMongoBackup::s3_upload(bucket, filename)
+    AWS::S3::S3Object.store("backups/#{filename}", open(filename), bucket)
+  end
+
+  def HerokuMongoBackup::s3_download(bucket, filename)
+    content = AWS::S3::S3Object.value("backups/#{filename}", bucket)
+    return content
+  end
+end
+
+
+
+
+begin
+  require 'fog'
+rescue LoadError
+  #
+  # There is no 'fog' in Gemfile
+  #
+  #puts "There is no 'fog' gem in Gemfile."
+end
+
+if defined?(Fog)
+  #
+  # Using 'aws/s3' gem as Amazon S3 interface
+  #
+  #puts "Using \'aws/s3\' gem as Amazon S3 interface."
+  def HerokuMongoBackup::s3_connect(bucket, key, secret)
+    connection = Fog::Storage.new({
+      :provider                 => 'AWS',
+      :aws_access_key_id        => key,
+      :aws_secret_access_key    => secret
+    })
+    directory = connection.directories.new(:key => bucket)
+    return directory
+  end
+
+  def HerokuMongoBackup::s3_upload(directory, filename)
+    file = directory.files.create(
+      :key    => "backups/#{filename}",
+      :body   => open(filename),
+      :public => true
+    )    
+  end
+
+  def HerokuMongoBackup::s3_download(directory, filename)
+    file = directory.files.get("backups/#{filename}")
+    return file.body
+  end
+
+
+
+
+
+
+else
+  logging = Logger.new(STDOUT)
+  logging.error "\n\nheroku-mongo-backup: Please include 's3', 'aws/s3' or 'fog' gem in applications Gemfile for uploading backup to S3 bucket. (ignore this if using FTP)\n\n"
+end
+
+
+
 

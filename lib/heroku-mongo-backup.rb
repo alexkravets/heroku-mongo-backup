@@ -1,7 +1,6 @@
 # encoding: UTF-8
 
 require 'mongo'
-require 'bson'
 require 'json'
 require 'zlib'
 require 'uri'
@@ -110,6 +109,12 @@ module HerokuMongoBackup
     def s3_connect
       bucket            = ENV['S3_BACKUPS_BUCKET']
       if bucket.nil?
+        bucket          = ENV['S3_BACKUP_BUCKET']
+      end
+      if bucket.nil?
+        bucket          = ENV['S3_BACKUP']
+      end
+      if bucket.nil?
         bucket          = ENV['S3_BUCKET']
       end
 
@@ -117,10 +122,16 @@ module HerokuMongoBackup
       if access_key_id.nil?
         access_key_id   = ENV['S3_KEY']
       end
+      if access_key_id.nil?
+        access_key_id   = ENV['AWS_ACCESS_KEY_ID']
+      end
 
       secret_access_key = ENV['S3_SECRET_KEY']
       if secret_access_key.nil?
         secret_access_key = ENV['S3_SECRET']
+      end
+      if secret_access_key.nil?
+        secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
       end
 
       @bucket = HerokuMongoBackup::s3_connect(bucket, access_key_id, secret_access_key)
@@ -145,10 +156,17 @@ module HerokuMongoBackup
         #config_template = ERB.new(IO.read("config/mongoid.yml"))
         #uri = YAML.load(config_template.result)['production']['uri']
         uri = ENV['MONGO_URL']
+
+        if uri.nil?
+          uri = ENV['MONGOHQ_URL']
+        end
+        if uri.nil?
+          uri = ENV['MONGOLAB_URI']
+        end          
       else
         mongoid_config  = YAML.load_file("config/mongoid.yml")
         config = {}
-        defaults          = mongoid_config['defaults']
+        defaults        = mongoid_config['defaults']
         dev_config      = mongoid_config['development']
 
         config.merge!(defaults) unless defaults.nil?
@@ -158,6 +176,14 @@ module HerokuMongoBackup
         port            = config['port']
         database        = config['database']
         uri = "mongodb://#{host}:#{port}/#{database}"
+
+        if uri == 'mongodb://:/' # new mongoid version 3.x
+          mongoid_config  = YAML.load_file("config/mongoid.yml")
+          dev_config      = mongoid_config['development']['sessions']['default']
+          host_port       = dev_config['hosts'].first
+          database        = dev_config['database']
+          uri = "mongodb://#{host_port}/#{database}"
+        end
       end
   
       @url = uri
@@ -200,4 +226,3 @@ module HerokuMongoBackup
     end
   end
 end
-

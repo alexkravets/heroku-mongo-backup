@@ -13,7 +13,7 @@ namespace :mongo do
     if ENV['FILE']
       HerokuMongoBackup::Backup.new.restore ENV['FILE']
     else
-      puts "Please provide backup file to restore from. Thanks!"
+      puts "Please provide backup file to restore from, format: rake mongo:restore FILE=<backup-file.gz>"
     end
   end
 end
