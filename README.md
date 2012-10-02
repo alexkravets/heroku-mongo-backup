@@ -15,7 +15,7 @@
 
 Add gem to the ```Gemfile```: ```gem "heroku-mongo-backup"``` - if everything's okay ```rake -T``` command should show ```rake mongo:backup``` rake tasks.
 
-For S3 support **heroku-mongo-backup** requires ```s3``` or ```aws-s3``` library. One of those should be in ```Gemfile```, if any of those two is present add ```aws-s3```.
+For S3 support **heroku-mongo-backup** requires ```s3``` or ```aws-s3``` or ```fog``` library. One of those should be in ```Gemfile```, if you don't care add ```fog``` it's seems to be the most advanced.
 
 Configure heroku scheduler to run ```mongo:backup``` rake task. Or if cron is used add backup task to ```/lib/tasks/cron.rake``` file:
 
@@ -30,7 +30,7 @@ Set Heroku environment variables:
 
 ```heroku config:add S3_BACKUPS_BUCKET=_value_ S3_KEY_ID=_value_ S3_SECRET_KEY=_value_ MONGO_URL=_value_```
 
-First three are Amazon S3 auth settings and the last one should be copy of *MONGOHQ_URI* or *MONGOLAB_URI* depending on what heroku add-on is used for mongo. *MONGO_URL* is a variable which is used also for **heroku-mongo-sync** command.
+On MONGO_URL place anyone of these is assaptable: *MONGOHQ_URI* or *MONGOLAB_URI*.
 
 For FTP set these variables:
 

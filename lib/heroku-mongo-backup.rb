@@ -188,7 +188,7 @@ module HerokuMongoBackup
   
       @url = uri
   
-      puts "Using databased: #{@url}"
+      puts "Using database: #{@url}"
   
       self.db_connect
 
