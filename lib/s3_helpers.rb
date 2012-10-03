@@ -38,6 +38,10 @@ if defined?(S3)
 
       return content
     end
+
+    def HerokuMongoBackup::remove_old_backup_files(files_number_to_leave)
+    end
+
 end
 
 
@@ -59,7 +63,6 @@ if defined?(AWS)
   def HerokuMongoBackup::s3_connect(bucket, key, secret)
     AWS::S3::Base.establish_connection!(:access_key_id     => key,
                                         :secret_access_key => secret)
-    # This is probably doesn't work
     return bucket
   end
 
@@ -71,6 +74,22 @@ if defined?(AWS)
     content = AWS::S3::S3Object.value("backups/#{filename}", bucket)
     return content
   end
+
+  def HerokuMongoBackup::remove_old_backup_files(bucket_name, files_number_to_leave)
+    bucket = Bucket.find(bucket_name)
+
+    object_keys = []
+    bucket.objects.each { |o| object_keys << o.key }
+
+    object_keys = object_keys.sort
+
+    excess = object_keys.count - files_number_to_leave
+
+    if excess > 0
+      (0..excess-1).each { |i| S3Object.find(object_keys[i], bucket_name).delete }
+    end
+  end
+
 end
 
 
@@ -113,10 +132,18 @@ if defined?(Fog)
     return file.body
   end
 
-
-
-
-
+  def HerokuMongoBackup::remove_old_backup_files(directory, files_number_to_leave)
+    total_backups = directory.files.all.size
+    
+    if total_backups > files_number_to_leave
+      
+      files_to_destroy = (0..total_backups-files_number_to_leave-1).collect{|i| directory.files.all[i] }
+      
+      files_to_destroy.each do |f|
+        f.destroy
+      end
+    end
+  end
 
 else
   logging = Logger.new(STDOUT)

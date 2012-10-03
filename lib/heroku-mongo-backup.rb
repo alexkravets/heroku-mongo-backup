@@ -203,7 +203,7 @@ module HerokuMongoBackup
       end
     end
 
-    def backup
+    def backup files_number_to_leave=0
       self.chdir    
       self.store
 
@@ -212,6 +212,10 @@ module HerokuMongoBackup
         @ftp.close
       else
         self.s3_upload
+      end
+
+      if files_number_to_leave > 0
+        HerokuMongoBackup::remove_old_backup_files(@bucket, files_number_to_leave)
       end
     end
     
