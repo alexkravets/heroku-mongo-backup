@@ -45,6 +45,8 @@ If you want to automatically remove old backup files pass ```MAX_BACKUPS``` para
 
 * ```heroku run rake mongo:backup MAX_BACKUPS=7```
 
+**NOTE:** This only works for ```fog``` and ```aws/s3``` gems. You're welcome to add support of ```s3```.
+
 Restore from backup:
 
 * ```heroku run rake mongo:restore FILE=backup-file-name.gz```
