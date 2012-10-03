@@ -40,6 +40,13 @@ For FTP set these variables:
 ## Rake Commands
 
 * ```heroku run rake mongo:backup```
+
+If you want to automatically remove old backup files pass ```MAX_BACKUPS``` parameter to the rake command:
+
+* ```heroku run rake mongo:backup MAX_BACKUPS=7```
+
+Restore from backup:
+
 * ```heroku run rake mongo:restore FILE=backup-file-name.gz```
 
 If you want to restore from local file run:
