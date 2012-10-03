@@ -149,7 +149,7 @@ module HerokuMongoBackup
       end
     end
 
-    def initialize
+    def initialize connect = true
       @file_name = Time.now.strftime("%Y-%m-%d_%H-%M-%S.gz")
   
       if( ['production', 'staging'].include?(ENV['RAILS_ENV'] || ENV['RACK_ENV']) )
@@ -194,10 +194,12 @@ module HerokuMongoBackup
   
       self.db_connect
 
-      if ENV['UPLOAD_TYPE'] == 'ftp'
-        self.ftp_connect
-      else
-        self.s3_connect
+      if connect
+        if ENV['UPLOAD_TYPE'] == 'ftp'
+          self.ftp_connect
+        else
+          self.s3_connect
+        end
       end
     end
 
@@ -213,17 +215,20 @@ module HerokuMongoBackup
       end
     end
     
-    def restore file_name
+    def restore file_name, download_file = true
       @file_name = file_name
   
       self.chdir
       
-      if ENV['UPLOAD_TYPE'] == 'ftp'
-        self.ftp_download
-        @ftp.close
-      else
-        self.s3_download
+      if download_file
+        if ENV['UPLOAD_TYPE'] == 'ftp'
+          self.ftp_download
+          @ftp.close
+        else
+          self.s3_download
+        end
       end
+
       self.load
     end
   end
