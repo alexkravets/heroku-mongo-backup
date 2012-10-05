@@ -39,7 +39,9 @@ if defined?(S3)
       return content
     end
 
-    def HerokuMongoBackup::remove_old_backup_files(files_number_to_leave)
+    def HerokuMongoBackup::remove_old_backup_files(bucket, files_number_to_leave)
+      excess = ( object_keys = bucket.objects.find_all(:prefix => "backups/").map { |o| o.key }.sort ).count - files_number_to_leave
+      (0..excess-1).each { |i| bucket.objects.find(object_keys[i]).destroy } if excess > 0
     end
 
 end
@@ -75,19 +77,9 @@ if defined?(AWS)
     return content
   end
 
-  def HerokuMongoBackup::remove_old_backup_files(bucket_name, files_number_to_leave)
-    bucket = Bucket.find(bucket_name)
-
-    object_keys = []
-    bucket.objects.each { |o| object_keys << o.key }
-
-    object_keys = object_keys.sort
-
-    excess = object_keys.count - files_number_to_leave
-
-    if excess > 0
-      (0..excess-1).each { |i| S3Object.find(object_keys[i], bucket_name).delete }
-    end
+  def HerokuMongoBackup::remove_old_backup_files(bucket, files_number_to_leave)
+    excess = ( object_keys = AWS::S3::Bucket.find(bucket).objects(:prefix => 'backups/').map { |o| o.key }.sort ).count - files_number_to_leave
+    (0..excess-1).each { |i| AWS::S3::S3Object.find(object_keys[i], bucket).delete } if excess > 0
   end
 
 end
