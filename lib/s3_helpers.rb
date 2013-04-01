@@ -114,8 +114,7 @@ if defined?(Fog)
   def HerokuMongoBackup::s3_upload(directory, filename)
     file = directory.files.create(
       :key    => "backups/#{filename}",
-      :body   => open(filename),
-      :public => true
+      :body   => open(filename)
     )    
   end
 
