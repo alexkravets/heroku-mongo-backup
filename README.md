@@ -65,3 +65,9 @@ For Rails 2 add this to your Rakefile to import rake tasks:
 4. [moonhouse - moonhouse.se](http://www.moonhouse.se/ "David Hall") - default config improvement
 5. [wolfpakz](https://github.com/wolfpakz "Dan Porter") - Rails2 support
 6. [solacreative](http://sola-la.com/creative "Taro Murao") - Max backups feature for aws/s3 and s3 gems
+7. [aarti](https://github.com/aarti "aarti") - minor fixes
+
+
+
+
+
