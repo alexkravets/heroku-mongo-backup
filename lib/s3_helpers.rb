@@ -98,9 +98,9 @@ end
 
 if defined?(Fog)
   #
-  # Using 'aws/s3' gem as Amazon S3 interface
+  # Using 'fog' gem as Amazon S3 interface
   #
-  #puts "Using \'aws/s3\' gem as Amazon S3 interface."
+  #puts "Using \'fog\' gem as Amazon S3 interface."
   def HerokuMongoBackup::s3_connect(bucket, key, secret)
     connection = Fog::Storage.new({
       :provider                 => 'AWS',
