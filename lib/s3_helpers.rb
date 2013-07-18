@@ -124,11 +124,11 @@ if defined?(Fog)
   end
 
   def HerokuMongoBackup::remove_old_backup_files(directory, dirname, files_number_to_leave)
-    total_backups = directory.files.all.size
+    total_backups = directory.files.all({:prefix => "#{dirname}/"}).size
     
     if total_backups > files_number_to_leave
       
-      files_to_destroy = (0..total_backups-files_number_to_leave-1).collect{|i| directory.files.all[i] }
+      files_to_destroy = (0..total_backups-files_number_to_leave-1).collect{|i| directory.files.all({:prefix => "#{dirname}/"})[i] }
       
       files_to_destroy.each do |f|
         f.destroy
