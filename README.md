@@ -45,6 +45,11 @@ If you want to automatically remove old backup files pass ```MAX_BACKUPS``` para
 
 * ```heroku run rake mongo:backup MAX_BACKUPS=7```
 
+If you're uploading to S3, backup files will be stored as ```backups/YYYY-MM-DD_hh-mm-ss.gz``` by default. To change the directory name, pass in the ```S3_BACKUP_DIR``` parameter:
+
+* ```heroku run rake mongo:backup S3_BACKUP_DIR=daily```
+* Backup files would then be stored as ```daily/backup-file-name.gz``` instead of ```backups/backup-file-name.gz```.
+
 Restore from backup:
 
 * ```heroku run rake mongo:restore FILE=backup-file-name.gz```
