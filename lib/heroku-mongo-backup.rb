@@ -118,6 +118,18 @@ module HerokuMongoBackup
         bucket          = ENV['S3_BUCKET']
       end
 
+      dir_name          = ENV['S3_BACKUP_DIR']
+      if dir_name.nil?
+        dir_name        = ENV['S3_BACKUP_DIRNAME']
+      end
+      if dir_name.nil?
+        dir_name        = ENV['S3_BACKUP_DIR_NAME']
+      end
+      if dir_name.nil?
+        dir_name        = 'backups'
+      end
+      @dir_name = dir_name
+
       access_key_id     = ENV['S3_KEY_ID']
       if access_key_id.nil?
         access_key_id   = ENV['S3_KEY']
@@ -138,12 +150,12 @@ module HerokuMongoBackup
     end
 
     def s3_upload
-      HerokuMongoBackup::s3_upload(@bucket, @file_name)
+      HerokuMongoBackup::s3_upload(@bucket, @dir_name, @file_name)
     end
 
     def s3_download
       open(@file_name, 'w') do |file|
-        file_content = HerokuMongoBackup::s3_download(@bucket, @file_name)
+        file_content = HerokuMongoBackup::s3_download(@bucket, @dir_name, @file_name)
         file.binmode
         file.write file_content
       end
@@ -215,7 +227,7 @@ module HerokuMongoBackup
       end
 
       if files_number_to_leave > 0
-        HerokuMongoBackup::remove_old_backup_files(@bucket, files_number_to_leave)
+        HerokuMongoBackup::remove_old_backup_files(@bucket, @dir_name, files_number_to_leave)
       end
     end
     
