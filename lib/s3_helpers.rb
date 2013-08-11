@@ -20,14 +20,14 @@ if defined?(S3)
       return bucket
     end
 
-    def HerokuMongoBackup::s3_upload(bucket, filename)
-      object = bucket.objects.build("backups/#{filename}")
+    def HerokuMongoBackup::s3_upload(bucket, dirname, filename)
+      object = bucket.objects.build("#{dirname}/#{filename}")
       object.content = open(filename)
       object.save
     end
 
-    def HerokuMongoBackup::s3_download(bucket, filename)
-      object  = bucket.objects.find("backups/#{filename}")
+    def HerokuMongoBackup::s3_download(bucket, dirname, filename)
+      object  = bucket.objects.find("#{dirname}/#{filename}")
       content = object.content(reload=true)
 
       puts "Backup file:"
@@ -39,8 +39,8 @@ if defined?(S3)
       return content
     end
 
-    def HerokuMongoBackup::remove_old_backup_files(bucket, files_number_to_leave)
-      excess = ( object_keys = bucket.objects.find_all(:prefix => "backups/").map { |o| o.key }.sort ).count - files_number_to_leave
+    def HerokuMongoBackup::remove_old_backup_files(bucket, dirname, files_number_to_leave)
+      excess = ( object_keys = bucket.objects.find_all(:prefix => "#{dirname}/").map { |o| o.key }.sort ).count - files_number_to_leave
       (0..excess-1).each { |i| bucket.objects.find(object_keys[i]).destroy } if excess > 0
     end
 
@@ -68,17 +68,17 @@ if defined?(AWS)
     return bucket
   end
 
-  def HerokuMongoBackup::s3_upload(bucket, filename)
-    AWS::S3::S3Object.store("backups/#{filename}", open(filename), bucket)
+  def HerokuMongoBackup::s3_upload(bucket, dirname, filename)
+    AWS::S3::S3Object.store("#{dirname}/#{filename}", open(filename), bucket)
   end
 
-  def HerokuMongoBackup::s3_download(bucket, filename)
-    content = AWS::S3::S3Object.value("backups/#{filename}", bucket)
+  def HerokuMongoBackup::s3_download(bucket, dirname, filename)
+    content = AWS::S3::S3Object.value("#{dirname}/#{filename}", bucket)
     return content
   end
 
-  def HerokuMongoBackup::remove_old_backup_files(bucket, files_number_to_leave)
-    excess = ( object_keys = AWS::S3::Bucket.find(bucket).objects(:prefix => 'backups/').map { |o| o.key }.sort ).count - files_number_to_leave
+  def HerokuMongoBackup::remove_old_backup_files(bucket, dirname, files_number_to_leave)
+    excess = ( object_keys = AWS::S3::Bucket.find(bucket).objects(:prefix => "#{dirname}/").map { |o| o.key }.sort ).count - files_number_to_leave
     (0..excess-1).each { |i| AWS::S3::S3Object.find(object_keys[i], bucket).delete } if excess > 0
   end
 
@@ -98,9 +98,9 @@ end
 
 if defined?(Fog)
   #
-  # Using 'aws/s3' gem as Amazon S3 interface
+  # Using 'fog' gem as Amazon S3 interface
   #
-  #puts "Using \'aws/s3\' gem as Amazon S3 interface."
+  #puts "Using \'fog\' gem as Amazon S3 interface."
   def HerokuMongoBackup::s3_connect(bucket, key, secret)
     connection = Fog::Storage.new({
       :provider                 => 'AWS',
@@ -111,24 +111,24 @@ if defined?(Fog)
     return directory
   end
 
-  def HerokuMongoBackup::s3_upload(directory, filename)
+  def HerokuMongoBackup::s3_upload(directory, dirname, filename)
     file = directory.files.create(
-      :key    => "backups/#{filename}",
+      :key    => "#{dirname}/#{filename}",
       :body   => open(filename)
     )    
   end
 
-  def HerokuMongoBackup::s3_download(directory, filename)
-    file = directory.files.get("backups/#{filename}")
+  def HerokuMongoBackup::s3_download(directory, dirname, filename)
+    file = directory.files.get("#{dirname}/#{filename}")
     return file.body
   end
 
-  def HerokuMongoBackup::remove_old_backup_files(directory, files_number_to_leave)
-    total_backups = directory.files.all.size
+  def HerokuMongoBackup::remove_old_backup_files(directory, dirname, files_number_to_leave)
+    total_backups = directory.files.all({:prefix => "#{dirname}/"}).size
     
     if total_backups > files_number_to_leave
       
-      files_to_destroy = (0..total_backups-files_number_to_leave-1).collect{|i| directory.files.all[i] }
+      files_to_destroy = (0..total_backups-files_number_to_leave-1).collect{|i| directory.files.all({:prefix => "#{dirname}/"})[i] }
       
       files_to_destroy.each do |f|
         f.destroy
