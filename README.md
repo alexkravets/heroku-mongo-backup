@@ -1,5 +1,7 @@
 ## heroku-mongo-backup *— backup mongodb on Heroku and push it to S3 or FTP storage*
 
+# This version targets Mongoid 4
+
 **heroku-mongo-backup** does:
 
 1. Backup mongodb collections to one file;
