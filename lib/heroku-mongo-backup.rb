@@ -57,7 +57,8 @@ module HerokuMongoBackup
       session.drop
 
       backup.each do |collection_name, documents|
-        session[collection_name].insert(documents)
+        puts collection_name
+        documents.each { |doc| session[collection_name].insert(doc) }
       end
 
       Rake::Task['db:mongoid:create_indexes'].invoke
