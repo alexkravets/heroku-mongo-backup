@@ -30,7 +30,7 @@ Set Heroku environment variables:
 
 ```heroku config:add S3_BACKUPS_BUCKET=_value_ S3_KEY_ID=_value_ S3_SECRET_KEY=_value_ MONGO_URL=_value_```
 
-On MONGO_URL place anyone of these is assaptable: *MONGOHQ_URI* or *MONGOLAB_URI*.
+On MONGO_URL place anyone of these is assaptable: *MONGOHQ_URL* or *MONGOLAB_URI*.
 
 For FTP set these variables:
 
