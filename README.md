@@ -13,7 +13,7 @@
 
 ## Configuration
 
-Add gem to the ```Gemfile```: ```gem "heroku-mongo-backup"``` - if everything's okay ```rake -T``` command should show ```rake mongo:backup``` rake tasks.
+For mongoid 4 add to the Gemfile: ```gem "heroku-mongo-backup", github: 'alexkravets/heroku-mongo-backup', branch: 'mongoid4'```, for the rest of mongoid versions add ```gem "heroku-mongo-backup"``` - if everything's okay ```rake -T``` command should show ```rake mongo:backup``` rake tasks.
 
 For S3 support **heroku-mongo-backup** requires ```s3``` or ```aws-s3``` or ```fog``` library. One of those should be in ```Gemfile```, if you don't care add ```fog``` it's seems to be the most advanced.
 
