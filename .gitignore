@@ -2,3 +2,4 @@ pkg
 *.swp
 *.swo
 .DS_Store
+.idea

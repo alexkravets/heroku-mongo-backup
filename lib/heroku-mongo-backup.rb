@@ -54,7 +54,7 @@ module HerokuMongoBackup
       backup = Marshal.load file.read
       file.close
 
-      session.drop
+      Mongoid.purge!
 
       backup.each do |collection_name, documents|
         puts collection_name
