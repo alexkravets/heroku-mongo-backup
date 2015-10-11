@@ -48,7 +48,7 @@ module HerokuMongoBackup
     end
 
     def load
-      session = ::Mongoid::Sessions.default
+      session = ::Mongoid::Clients.default
 
       file   = Zlib::GzipReader.open(@file_name)
       backup = Marshal.load file.read
