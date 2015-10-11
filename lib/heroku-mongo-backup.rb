@@ -29,7 +29,7 @@ module HerokuMongoBackup
     end
 
     def store
-      session = ::Mongoid::Sessions.default
+      session = ::Mongoid::Clients.default
 
       backup = {}
 
