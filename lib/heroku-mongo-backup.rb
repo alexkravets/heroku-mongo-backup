@@ -29,7 +29,7 @@ module HerokuMongoBackup
     end
 
     def store
-      session = ::Mongoid::Sessions.default
+      session = ::Mongoid::Clients.default
 
       backup = {}
 
@@ -48,7 +48,7 @@ module HerokuMongoBackup
     end
 
     def load
-      session = ::Mongoid::Sessions.default
+      session = ::Mongoid::Clients.default
 
       file   = Zlib::GzipReader.open(@file_name)
       backup = Marshal.load file.read
@@ -58,7 +58,7 @@ module HerokuMongoBackup
 
       backup.each do |collection_name, documents|
         puts collection_name
-        documents.each { |doc| session[collection_name].insert(doc) }
+        documents.each { |doc| session[collection_name].insert_one(doc) }
       end
 
       Rake::Task['db:mongoid:create_indexes'].invoke
